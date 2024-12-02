@@ -5,6 +5,7 @@ from pantallas.inicio import dibujar_pantalla_inicio, cambiar_dificultad
 from pantallas.principal import dibujar_pantalla_principal
 from pantallas.puntajes import dibujar_pantalla_puntajes
 from pantallas.pausa import dibujar_pantalla_pausa
+from pantallas.ganaste import dibujar_pantalla_ganaste
 
 #--------------------------------------------------------------------------------------------------------------
 # Inicializamos pygame
@@ -38,9 +39,14 @@ nombre_jugador = ""
 click_izq = pygame.MOUSEBUTTONDOWN
 dificultad = "Facil"
 cant_errores = 0
+
 #--------------------------------------------------------------------------------------------------------------
+
 # Variables para el Sudoku
 celda_actual = None
+sudoku_completo = matriz_resolucion()
+sudoku_oculto = matriz_oculta(sudoku_completo, dificultad)
+sudoku_actual = sudoku_modificable(sudoku_oculto)
 
 #--------------------------------------------------------------------------------------------------------------
 
@@ -63,10 +69,9 @@ while juego_corriendo:
                     # Cuando el jugador haga clic en "Jugar", generamos el Sudoku
                     tiempo_inicio = pygame.time.get_ticks()
                     pantalla_activa = "principal"
-                    sudoku_completo = matriz_resolucion()  # Generar la matriz resuelta
-                    sudoku_actual = generar_sudoku(dificultad)  # Generar el Sudoku actual
-                    celda_actual = None  # Reiniciar la celda seleccionada
-                    cant_errores = 0  # Reiniciar el contador de errores
+                    sudoku_actual = sudoku_modificable(sudoku_oculto)
+                    celda_actual = None
+                    cant_errores = 0
 
                 elif dibujar_boton_puntajes(pantalla).collidepoint(cursor):
                     pantalla_activa = "puntajes"
@@ -86,9 +91,11 @@ while juego_corriendo:
 
                 if dibujar_boton_reiniciar(pantalla).collidepoint(cursor):
                     celda_actual = None
-                    sudoku_actual = generar_sudoku(dificultad) # Generar un Sudoku nuevo
+                    sudoku_completo = matriz_resolucion()
+                    sudoku_oculto = matriz_oculta(sudoku_completo, dificultad) 
+                    sudoku_actual = sudoku_modificable(sudoku_oculto)
                     cant_errores = 0
-                    tiempo_inicio = pygame.time.get_ticks() # Reiniciar el temporizador
+                    tiempo_inicio = pygame.time.get_ticks()
 
                 elif dibujar_boton_volver(pantalla).collidepoint(cursor):
                     celda_actual = None
@@ -100,7 +107,6 @@ while juego_corriendo:
             elif pantalla_activa == "pausa":
                 if dibujar_boton_reanudar(pantalla).collidepoint(cursor): 
                         pantalla_activa = "principal"
-
 
             elif pantalla_activa == "puntajes":
                 if dibujar_boton_volver(pantalla).collidepoint(cursor):
@@ -121,9 +127,14 @@ while juego_corriendo:
     elif pantalla_activa == "principal":
         dibujar_pantalla_principal(pantalla, tiempo_inicio, cant_errores)
         rectangulo_sudoku = dibujar_matriz_sudoku(pantalla, sudoku_actual, celda_actual)
-        boton_pausa = dibujar_boton_pausa(pantalla)  # Línea nueva: Dibuja el botón de pausa
+        boton_pausa = dibujar_boton_pausa(pantalla)
+        # if ganaste_sudoku(sudoku_actual, sudoku_completo) == True:
+        #     pantalla_activa = "ganaste"
 
     elif pantalla_activa == "pausa":
         dibujar_pantalla_pausa(pantalla, ancho_pantalla, largo_pantalla)
+
+    elif pantalla_activa == "ganaste":
+        dibujar_pantalla_ganaste(pantalla, ancho_pantalla, largo_pantalla)
 
     pygame.display.flip()
