@@ -1,0 +1,35 @@
+#Enunciado:
+#De los 5 estudiantes de una clase, se registra:
+
+#El nombre
+#La nota final (entre 0 y 100)
+#La edad (mayor a 18 años)
+
+#Informar:
+#a. Nombre del estudiante con la nota más alta.
+#b. Nombre y edad del estudiante con la nota más baja.
+#c. El promedio de las notas de los estudiantes.
+#d. El promedio de las edades de los estudiantes.
+
+cantidad_ingresos = 5
+
+while cantidad_ingresos < 2:
+    nombre = input("Ingrese el nombre: ")
+    if nombre.len() == "":
+        print("Error: No ha ingresado su nombre.")
+        nombre = input("Ingrese de nuevo el nombre: ")
+
+    nota_final = input("Ingrese la nota final: ")
+    if nota_final.isdigit() == False:
+        print("Error: La nota final no es un número.")
+        nota_final = input("Ingrese de nuevo la nota final: ")
+    edad = input("Ingrese la edad: ")
+
+    edad_del_alumno = input("Ingrese la edad del estudiante: ")
+    if edad_del_alumno.isdigit() == False:
+        print("Error: La edad no es un número.")
+        edad_del_alumno = input("Ingrese de nuevo la edad del estudiante: ")
+    edad_del_alumno = int(edad_del_alumno)
+
+#INFORMES   
+#a. Nombre del estudiante con la nota más alta.

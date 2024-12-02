@@ -365,28 +365,33 @@ def dibujar_matriz_sudoku(pantalla, matriz, celda_actual):
     # Líneas horizontales y verticales
     for fila in range(10):  # Dibujar 9 líneas más una extra para el borde
         grosor = 3 if fila % 3 == 0 else 1  # Líneas más gruesas cada 3
-
-        pygame.draw.line(pantalla, (color_linea), (inicio_x, inicio_y + fila * tamaño_celda), # Dibujar lineas horizontales
-                         (inicio_x + 9 * tamaño_celda, inicio_y + fila * tamaño_celda), grosor)
-        
-        pygame.draw.line(pantalla, (color_linea), (inicio_x + fila * tamaño_celda, inicio_y), # Dibujar lineas verticales
-                         (inicio_x + fila * tamaño_celda, inicio_y + 9 * tamaño_celda), grosor)
+        dibujar_linea(pantalla, color_linea, fila, grosor, inicio_x, inicio_y, tamaño_celda)
 
     # Dibujar los números 
     fuente = pygame.font.SysFont("Arial", 30)
     for fila in range(len(matriz)):
         for columna in range(len(matriz[fila])):
-            numeros = fuente.render(str(matriz[fila][columna]), True, color_numeros)
-            x = inicio_x + columna * tamaño_celda + tamaño_celda // 3
-            y = inicio_y + fila * tamaño_celda + tamaño_celda // 4
-
-            # Si la celda es la seleccionada, la resaltamos en blanco
-            if celda_actual == (fila, columna):
-                pygame.draw.rect(pantalla, color_celda_actual, 
-                                 (inicio_x + columna * tamaño_celda, inicio_y + fila * tamaño_celda, tamaño_celda, tamaño_celda))
-            pantalla.blit(numeros, (x, y))
+            dibujar_numero(pantalla, fuente, matriz[fila][columna], fila, columna, inicio_x, inicio_y, tamaño_celda, color_numeros, celda_actual)
 
     return rect_tablero
+
+def dibujar_linea(pantalla, color_linea, fila, grosor, inicio_x, inicio_y, tamaño_celda):
+    pygame.draw.line(pantalla, color_linea, (inicio_x, inicio_y + fila * tamaño_celda), 
+                     (inicio_x + 9 * tamaño_celda, inicio_y + fila * tamaño_celda), grosor)
+    pygame.draw.line(pantalla, color_linea, (inicio_x + fila * tamaño_celda, inicio_y), 
+                     (inicio_x + fila * tamaño_celda, inicio_y + 9 * tamaño_celda), grosor)
+
+def dibujar_numero(pantalla, fuente, numero, fila, columna, inicio_x, inicio_y, tamaño_celda, color_numeros, celda_actual):
+    numeros = fuente.render(str(numero), True, color_numeros)
+    x = inicio_x + columna * tamaño_celda + tamaño_celda // 3
+    y = inicio_y + fila * tamaño_celda + tamaño_celda // 4
+
+    # Si la celda es la seleccionada, la resaltamos en blanco
+    if celda_actual == (fila, columna):
+        pygame.draw.rect(pantalla, (255, 255, 255), 
+                         (inicio_x + columna * tamaño_celda, inicio_y + fila * tamaño_celda, tamaño_celda, tamaño_celda))
+    pantalla.blit(numeros, (x, y))
+
 
 #------------------------------------------------------------------------------------------
 
@@ -428,7 +433,7 @@ def resaltar_celda(pantalla, celda_actual, sudoku_celdas):
             # Si el mouse está fuera del tablero
             elif not rect_tablero.collidepoint(pygame.mouse.get_pos()):
                 celda_actual = None
-    
+
     return celda_actual
 
 
@@ -468,23 +473,18 @@ def matriz_oculta(tablero_resuelto: list, dificultad: str) -> list:
     
     return tablero_oculto
 
-def sudoku_modificable(sudoku_oculto) -> list:
-    """
-    Genera una copia de la matriz oculta y la devuelve en su totalidad.
-    
-    Parámetros:
-        tablero_oculto (list): La matriz de Sudoku oculta.
-    
-    Retorna:
-        tablero_modificable (list): La copia de la matriz oculta.
-    """
+#--------------------------------------------------------------------------------------------
+
+def sudoku_modificable(sudoku_oculto):
     sudoku_actual = []
     for fila in sudoku_oculto:
-        nueva_fila = []
+        nueva_fila = []  
         for valor in fila:
             nueva_fila.append(valor)
-    sudoku_actual.append(nueva_fila)
+        sudoku_actual.append(nueva_fila)
+
     return sudoku_actual
+
 
 # #--------------------------------------------------------------------------------------------
 
