@@ -1,6 +1,7 @@
 import pygame
 from funciones import *
 from botones import *
+from constantes import *
 from pantallas.inicio import dibujar_pantalla_inicio, cambiar_dificultad
 from pantallas.principal import dibujar_pantalla_principal
 from pantallas.puntajes import dibujar_pantalla_puntajes
@@ -11,27 +12,36 @@ from pantallas.ganaste import dibujar_pantalla_ganaste
 # Inicializamos pygame
 pygame.init()
 #--------------------------------------------------------------------------------------------------------------
-# Tamaños y ubicaciones: X, Y
-ancho_pantalla = 800
-largo_pantalla = 600
-dimension_pantalla = (ancho_pantalla, largo_pantalla)
+
+# Configuración de la pantalla
+pantalla = pygame.display.set_mode(DIMENSION_PANTALLA)
+
 #--------------------------------------------------------------------------------------------------------------
+
 # Crear pantalla
-pantalla = pygame.display.set_mode(dimension_pantalla)
+pantalla = pygame.display.set_mode(DIMENSION_PANTALLA)
+
 #--------------------------------------------------------------------------------------------------------------
+
 # Cambiar el título del juego
 pygame.display.set_caption("Sudoku")
+
 #--------------------------------------------------------------------------------------------------------------
+
 # Icono del juego
 img_icono = pygame.image.load("SUDOKU/imagenes/icon_sudoku.png")
 pygame.display.set_icon(img_icono)
+
 #--------------------------------------------------------------------------------------------------------------
+
 # Música
 """ pygame.mixer.init()
 pygame.mixer.music.load("SUDOKU/musica/Vibe Mountain.mp3")
 pygame.mixer.music.set_volume(0.4)
 pygame.mixer.music.play(-1) """
+
 #--------------------------------------------------------------------------------------------------------------
+
 # Variables
 juego_corriendo = True
 pantalla_activa = "inicio"
@@ -44,9 +54,9 @@ cant_errores = 0
 
 # Variables para el Sudoku
 celda_actual = None
-sudoku_completo = matriz_resolucion()
-sudoku_oculto = matriz_oculta(sudoku_completo, dificultad)
-sudoku_actual = sudoku_modificable(sudoku_oculto)
+sudoku_completo = None
+sudoku_oculto = None
+sudoku_actual = None
 
 #--------------------------------------------------------------------------------------------------------------
 
@@ -69,6 +79,8 @@ while juego_corriendo:
                     # Cuando el jugador haga clic en "Jugar", generamos el Sudoku
                     tiempo_inicio = pygame.time.get_ticks()
                     pantalla_activa = "principal"
+                    sudoku_completo = matriz_resolucion()
+                    sudoku_oculto = matriz_oculta(sudoku_completo, dificultad)
                     sudoku_actual = sudoku_modificable(sudoku_oculto)
                     celda_actual = None
                     cant_errores = 0
@@ -128,13 +140,11 @@ while juego_corriendo:
         dibujar_pantalla_principal(pantalla, tiempo_inicio, cant_errores)
         rectangulo_sudoku = dibujar_matriz_sudoku(pantalla, sudoku_actual, celda_actual)
         boton_pausa = dibujar_boton_pausa(pantalla)
-        # if ganaste_sudoku(sudoku_actual, sudoku_completo) == True:
-        #     pantalla_activa = "ganaste"
 
     elif pantalla_activa == "pausa":
-        dibujar_pantalla_pausa(pantalla, ancho_pantalla, largo_pantalla)
+        dibujar_pantalla_pausa(pantalla, ANCHO_PANTALLA, LARGO_PANTALLA)
 
     elif pantalla_activa == "ganaste":
-        dibujar_pantalla_ganaste(pantalla, ancho_pantalla, largo_pantalla)
+        dibujar_pantalla_ganaste(pantalla, ANCHO_PANTALLA, LARGO_PANTALLA)
 
     pygame.display.flip()
