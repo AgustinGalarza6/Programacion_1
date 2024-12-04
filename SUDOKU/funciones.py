@@ -364,9 +364,6 @@ def dibujar_matriz_sudoku(pantalla, matriz, celda_actual, desde: int = 0, hasta:
     fuente = pygame.font.SysFont("Arial", TAMAÑO_FUENTE)
     for fila in range(len(matriz)):
         for columna in range(len(matriz[fila])):
-            # llamar funcion que decida de que color pintar el numero
-            # pasar dos matrices, comparar y ver si coinciden las posiciones
-            # pasar numero de matriz original en (fil, colum) y numero de la matriz oculta y modificable.
             dibujar_numero(pantalla, fuente, matriz[fila][columna], fila, columna, INICIO_X, INICIO_Y, TAMAÑO_CELDA, COLOR_NUMEROS, celda_actual)
     return rect_tablero
 
@@ -529,7 +526,7 @@ def ganaste_sudoku(sudoku_actual, sudoku_completo):
 
 # #--------------------------------------------------------------------------------------------
 
-def obtener_color_del_numero(matriz_original, matriz_modificable, fila, columna):
+def obtener_color_del_numero(matriz_original, matriz_modificable, tecla_ingresada, fila, columna, COLOR_CORRECTO, COLOR_INCORRECTO):
     """
     Determina el color que debe tener un número según si es correcto o incorrecto.
     
@@ -543,26 +540,47 @@ def obtener_color_del_numero(matriz_original, matriz_modificable, fila, columna)
         color (tuple): El color a usar (Rojo para incorrecto, Azul para correcto, None para no mostrar el color).
     """
     # Solo pintamos si el número es modificable (distinto de 0 en la matriz modificable)
-    if matriz_modificable[fila][columna] != 0:
+    if str(tecla_ingresada) and matriz_modificable[fila][columna] != 0:
         if matriz_modificable[fila][columna] == matriz_original[fila][columna]:
-            color_del_numero = (0, 0, 255)  # Azul (Correcto)
+            color_del_numero = COLOR_CORRECTO
         else:
-            color_del_numero = (255, 0, 0)  # Rojo (Incorrecto)
+            color_del_numero = COLOR_INCORRECTO
     return color_del_numero
 
+#--------------------------------------------------------------------------------------------
+
+def ganaste_el_sudoku(sudoku_actual, sudoku_completo):
+    # Convertir ambos tableros a listas de cadenas
+    sudoku_completo_str = []
+    for fila in sudoku_completo:
+        fila_str = [str(celda) for celda in fila]
+        sudoku_completo_str.append(fila_str)
+
+    sudoku_actual_str = []
+    for fila in sudoku_actual:
+        fila_str = [str(celda) for celda in fila]
+        sudoku_actual_str.append(fila_str)
+
+    return sudoku_actual_str == sudoku_completo_str
+
+#--------------------------------------------------------------------------------------------
+
+def calcular_puntaje(cant_errores, minutos, dificultad, puntaje_base):
+    if dificultad == "Facil":
+        bonus_dificultad = 1.25
+    elif dificultad == "Medio":
+        bonus_dificultad = 1.5
+    elif dificultad == "Dificil":
+        bonus_dificultad = 1.75    
+
+    puntaje_final = (puntaje_base - (cant_errores * 50) - (minutos * 10) * bonus_dificultad)
+
+    return puntaje_final
 
 
+def calcular_tiempo(tiempo_inicio):
+    tiempo_transcurrido = pygame.time.get_ticks() - tiempo_inicio
+    # Minutos
+    minutos_transcurridos = tiempo_transcurrido // 60000
 
-
-# def calcular_puntaje(cant_errores, puntaje_base, minutos, dificultad, bonus_dificultad):
-
-#     if dificultad == "Facil":
-#         bonus_dificultad = 1.25
-#     elif dificultad == "Medio":
-#         bonus_dificultad = 1.5
-#     elif dificultad == "Dificil":
-#         bonus_dificultad = 1.75    
-
-#     puntaje_final = (puntaje_base - (cant_errores * 50) - (minutos * 10) * bonus_dificultad)
-
-#     return puntaje_final
+    return minutos_transcurridos

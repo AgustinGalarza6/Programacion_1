@@ -49,6 +49,7 @@ nombre_jugador = ""
 click_izq = pygame.MOUSEBUTTONDOWN
 dificultad = "Facil"
 cant_errores = 0
+puntos = 1000
 
 #--------------------------------------------------------------------------------------------------------------
 
@@ -60,8 +61,8 @@ sudoku_actual = None
 
 #--------------------------------------------------------------------------------------------------------------
 
+# En tu ciclo principal, dentro del evento del juego, agrega la verificación:
 while juego_corriendo:
-    # Iterar sobre todos los eventos
     lista_eventos = pygame.event.get()
     for evento in lista_eventos:
         if evento.type == pygame.QUIT:
@@ -83,8 +84,11 @@ while juego_corriendo:
                     sudoku_oculto = matriz_oculta(sudoku_completo, dificultad)
                     sudoku_actual = sudoku_modificable(sudoku_oculto)
                     celda_actual = None
-                    cant_errores = 0
-
+                    # PUNTAJE
+                    tiempo_inicio = pygame.time.get_ticks()
+                    minutos = (pygame.time.get_ticks() - tiempo_inicio) // 60000
+                    puntaje = calcular_puntaje(cant_errores, minutos, dificultad, puntos)
+                    
                 elif dibujar_boton_puntajes(pantalla).collidepoint(cursor):
                     pantalla_activa = "puntajes"
 
@@ -93,11 +97,10 @@ while juego_corriendo:
                     pygame.quit()
                     quit()
 
-                # Detectar clic en el botón de "Dificultad"
                 elif dibujar_boton_dificultad(pantalla, dificultad).collidepoint(cursor):
                     dificultad = cambiar_dificultad(dificultad)
 
-            # Detectar clic en el botón "Volver" en las pantallas "principal" y "puntajes"
+            # Detectar clic en los botones de la pantalla principal
             elif pantalla_activa == "principal":
                 celda_actual = resaltar_celda(pantalla, celda_actual, sudoku_celdas())
 
@@ -106,15 +109,17 @@ while juego_corriendo:
                     sudoku_completo = matriz_resolucion()
                     sudoku_oculto = matriz_oculta(sudoku_completo, dificultad) 
                     sudoku_actual = sudoku_modificable(sudoku_oculto)
-                    cant_errores = 0
-                    tiempo_inicio = pygame.time.get_ticks()
 
                 elif dibujar_boton_volver(pantalla).collidepoint(cursor):
                     celda_actual = None
                     pantalla_activa = "inicio"
 
                 elif dibujar_boton_pausa(pantalla).collidepoint(cursor): 
-                    pantalla_activa = "pausa" 
+                    pantalla_activa = "pausa"
+
+                # Verificar si el sudoku fue completado correctamente
+                if ganaste_el_sudoku(sudoku_actual, sudoku_completo):
+                    pantalla_activa = "ganaste"  # Si es correcto, cambiar a la pantalla de ganaste
 
             elif pantalla_activa == "pausa":
                 if dibujar_boton_reanudar(pantalla).collidepoint(cursor): 
@@ -145,6 +150,6 @@ while juego_corriendo:
         dibujar_pantalla_pausa(pantalla, ANCHO_PANTALLA, LARGO_PANTALLA)
 
     elif pantalla_activa == "ganaste":
-        dibujar_pantalla_ganaste(pantalla, ANCHO_PANTALLA, LARGO_PANTALLA)
+        dibujar_pantalla_ganaste(pantalla, ANCHO_PANTALLA, LARGO_PANTALLA, puntos)
 
     pygame.display.flip()
