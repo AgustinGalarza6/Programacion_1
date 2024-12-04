@@ -573,8 +573,9 @@ def calcular_puntaje(cant_errores, minutos, dificultad, puntaje_base):
     elif dificultad == "Dificil":
         bonus_dificultad = 1.75    
 
-    puntaje_final = (puntaje_base - (cant_errores * 50) - (minutos * 10) * bonus_dificultad)
-
+    # Calcular el puntaje final restando puntos por los errores y el tiempo, multiplicado por el bono de dificultad
+    puntaje_final = (puntaje_base - (cant_errores * 50) - (minutos * 10)) * bonus_dificultad
+    # 1000 - (4 * 50) - (1 * 10) * 1.25
     return puntaje_final
 
 

@@ -84,10 +84,6 @@ while juego_corriendo:
                     sudoku_oculto = matriz_oculta(sudoku_completo, dificultad)
                     sudoku_actual = sudoku_modificable(sudoku_oculto)
                     celda_actual = None
-                    # PUNTAJE
-                    tiempo_inicio = pygame.time.get_ticks()
-                    minutos = (pygame.time.get_ticks() - tiempo_inicio) // 60000
-                    puntaje = calcular_puntaje(cant_errores, minutos, dificultad, puntos)
                     
                 elif dibujar_boton_puntajes(pantalla).collidepoint(cursor):
                     pantalla_activa = "puntajes"
@@ -149,7 +145,18 @@ while juego_corriendo:
     elif pantalla_activa == "pausa":
         dibujar_pantalla_pausa(pantalla, ANCHO_PANTALLA, LARGO_PANTALLA)
 
+    
     elif pantalla_activa == "ganaste":
-        dibujar_pantalla_ganaste(pantalla, ANCHO_PANTALLA, LARGO_PANTALLA, puntos)
+        # Calcular tiempo transcurrido
+        tiempo_transcurrido = (pygame.time.get_ticks() - tiempo_inicio) // 1000  # Tiempo en segundos
+        minutos = tiempo_transcurrido // 60
+        segundos = tiempo_transcurrido % 60
+
+        # Calcular puntaje
+        puntaje = calcular_puntaje(cant_errores, minutos, dificultad, puntos)
+
+        # Dibujar pantalla de ganaste con el puntaje calculado
+        dibujar_pantalla_ganaste(pantalla, ANCHO_PANTALLA, LARGO_PANTALLA, puntaje)
+
 
     pygame.display.flip()
