@@ -172,12 +172,22 @@ while juego_corriendo:
             elif pantalla_activa == "puntajes":
                 if dibujar_boton_volver(pantalla).collidepoint(cursor):
                     pantalla_activa = "inicio"
-
+                
 
         if evento.type == pygame.KEYDOWN:
             tecla_presionada = pygame.key.name(evento.key) 
+            
             if pantalla_activa == "principal":
                 sudoku_actual, celda_actual, cant_errores = ingresar_numeros(tecla_presionada, sudoku_actual, sudoku_completo, celda_actual, cant_errores)
+
+                # Borrado de la celda con la tecla DELETE
+                if evento.key == pygame.K_DELETE:
+                    fila, columna = celda_actual
+                    # Verificar si la celda no está vacía antes de borrar
+                    if sudoku_actual[fila][columna] != " ":
+                        sudoku_actual[fila][columna] = " "  # Asignamos espacio vacío para borrar el número
+                    # Redibujar la matriz después de borrar
+                    rect_tablero = dibujar_matriz_sudoku(pantalla, sudoku_actual, celda_actual, sudoku_completo)
 
             elif pantalla_activa == "ganaste" and caja_texto_activa:
                 if evento.key == pygame.K_BACKSPACE:
@@ -194,8 +204,6 @@ while juego_corriendo:
                         nombre_jugador = ""
                     else:
                         caja_texto_activa = False
-
-
 
     # Dibujar pantallas
     if pantalla_activa == "inicio":
