@@ -2,11 +2,13 @@ import pygame
 from funciones import *
 from botones import *
 from constantes import *
+from archivos import *
 from pantallas.inicio import dibujar_pantalla_inicio, cambiar_dificultad
 from pantallas.principal import dibujar_pantalla_principal
 from pantallas.puntajes import dibujar_pantalla_puntajes
 from pantallas.pausa import dibujar_pantalla_pausa
 from pantallas.ganaste import dibujar_pantalla_ganaste
+
 
 #--------------------------------------------------------------------------------------------------------------
 # Inicializamos pygame
@@ -49,7 +51,17 @@ nombre_jugador = ""
 click_izq = pygame.MOUSEBUTTONDOWN
 dificultad = "Facil"
 cant_errores = 0
-puntos = 1000
+puntaje_base = 1000
+caja_texto_activa = False
+
+#bonus_dificultad = 0
+
+if dificultad == "Facil":
+    bonus_dificultad = 1.25
+elif dificultad == "Medio":
+    bonus_dificultad = 1.5
+elif dificultad == "Dificil":
+    bonus_dificultad = 1.75  
 
 #--------------------------------------------------------------------------------------------------------------
 
@@ -61,7 +73,13 @@ sudoku_actual = None
 
 #--------------------------------------------------------------------------------------------------------------
 
-# En tu ciclo principal, dentro del evento del juego, agrega la verificación:
+# Variables json
+user_text = nombre_jugador  # Inicializa con el nombre actual del jugador
+input_rect = pygame.Rect(300, 300, 200, 40)
+fuente_texto = pygame.font.SysFont("Arial", 30)
+lista_puntajes = leer_json("SUDOKU/usuarios.json")
+
+
 while juego_corriendo:
     lista_eventos = pygame.event.get()
     for evento in lista_eventos:
@@ -86,6 +104,8 @@ while juego_corriendo:
                     celda_actual = None
                     
                 elif dibujar_boton_puntajes(pantalla).collidepoint(cursor):
+                    #if bandera_puntaje == False:
+                    ordenar_puntajes(lista_puntajes)
                     pantalla_activa = "puntajes"
 
                 elif dibujar_boton_salir(pantalla).collidepoint(cursor):
@@ -105,6 +125,8 @@ while juego_corriendo:
                     sudoku_completo = matriz_resolucion()
                     sudoku_oculto = matriz_oculta(sudoku_completo, dificultad) 
                     sudoku_actual = sudoku_modificable(sudoku_oculto)
+                    tiempo_inicio = pygame.time.get_ticks()
+                    cant_errores = 0
 
                 elif dibujar_boton_volver(pantalla).collidepoint(cursor):
                     celda_actual = None
@@ -116,30 +138,75 @@ while juego_corriendo:
                 # Verificar si el sudoku fue completado correctamente
                 if ganaste_el_sudoku(sudoku_actual, sudoku_completo):
                     pantalla_activa = "ganaste"  # Si es correcto, cambiar a la pantalla de ganaste
+                    tiempo_transcurrido = (pygame.time.get_ticks() - tiempo_inicio) // 1000  # Tiempo en segundos
+                    minutos = tiempo_transcurrido // 60
+                    segundos = tiempo_transcurrido % 60
+                    puntaje_final = calcular_puntaje(cant_errores, minutos, dificultad, puntaje_base, bonus_dificultad)
+                    #puntaje_final = (puntaje_base - (cant_errores * 50) - (minutos * 10)) * bonus_dificultad
 
             elif pantalla_activa == "pausa":
                 if dibujar_boton_reanudar(pantalla).collidepoint(cursor): 
                         pantalla_activa = "principal"
 
+
+            elif pantalla_activa == "ganaste":
+                if dibujar_boton_nueva_partida(pantalla).collidepoint(cursor):
+                    pantalla_activa = "principal"
+                    celda_actual = None
+                    sudoku_completo = matriz_resolucion()
+                    sudoku_oculto = matriz_oculta(sudoku_completo, dificultad) 
+                    sudoku_actual = sudoku_modificable(sudoku_oculto)
+                    tiempo_inicio = pygame.time.get_ticks()
+                    cant_errores = 0
+
+                elif dibujar_boton_ver_puntajes(pantalla).collidepoint(cursor):
+                    pantalla_activa = "puntajes"
+
+                elif pantalla_activa == "ganaste":
+                    if dibujar_caja_texto(pantalla).collidepoint(cursor):
+                        caja_texto_activa = True  
+                    else:
+                        caja_texto_activa = False 
+
+
             elif pantalla_activa == "puntajes":
                 if dibujar_boton_volver(pantalla).collidepoint(cursor):
                     pantalla_activa = "inicio"
 
+
         if evento.type == pygame.KEYDOWN:
-            tecla_presionada = pygame.key.name(evento.key)
+            tecla_presionada = pygame.key.name(evento.key) 
             if pantalla_activa == "principal":
                 sudoku_actual, celda_actual, cant_errores = ingresar_numeros(tecla_presionada, sudoku_actual, sudoku_completo, celda_actual, cant_errores)
+
+            elif pantalla_activa == "ganaste" and caja_texto_activa:
+                if evento.key == pygame.K_BACKSPACE:
+                    nombre_jugador = nombre_jugador[:-1]  
+                elif len(nombre_jugador) < 15 and evento.key != pygame.K_RETURN:  
+                    nombre_jugador += evento.unicode
+
+                elif evento.key == pygame.K_RETURN:
+                    if 0 < len(nombre_jugador) <= 15:
+                        indice_jugador = buscar_jugador(lista_puntajes,nombre_jugador)
+                        cambiar_estadisticas_jugador(lista_puntajes,indice_jugador,puntaje_final,nombre_jugador)
+                        guardar_json("puntajes.json",lista_puntajes)
+                        pantalla_activa = "inicio"
+                        nombre_jugador = ""
+                    else:
+                        caja_texto_activa = False
+
+
 
     # Dibujar pantallas
     if pantalla_activa == "inicio":
         dibujar_pantalla_inicio(pantalla, dificultad)
 
     elif pantalla_activa == "puntajes":
-        dibujar_pantalla_puntajes(pantalla)
+        dibujar_pantalla_puntajes(pantalla,lista_puntajes)
 
     elif pantalla_activa == "principal":
         dibujar_pantalla_principal(pantalla, tiempo_inicio, cant_errores)
-        rectangulo_sudoku = dibujar_matriz_sudoku(pantalla, sudoku_actual, celda_actual)
+        rectangulo_sudoku = dibujar_matriz_sudoku(pantalla, sudoku_actual, celda_actual,sudoku_completo)
         boton_pausa = dibujar_boton_pausa(pantalla)
 
     elif pantalla_activa == "pausa":
@@ -147,16 +214,12 @@ while juego_corriendo:
 
     
     elif pantalla_activa == "ganaste":
-        # Calcular tiempo transcurrido
-        tiempo_transcurrido = (pygame.time.get_ticks() - tiempo_inicio) // 1000  # Tiempo en segundos
-        minutos = tiempo_transcurrido // 60
-        segundos = tiempo_transcurrido % 60
-
-        # Calcular puntaje
-        puntaje = calcular_puntaje(cant_errores, minutos, dificultad, puntos)
+        # Calcular el tiempo transcurrido
 
         # Dibujar pantalla de ganaste con el puntaje calculado
-        dibujar_pantalla_ganaste(pantalla, ANCHO_PANTALLA, LARGO_PANTALLA, puntaje)
+        #puntaje_final = calcular_puntaje(cant_errores, minutos, dificultad, puntaje_base, bonus_dificultad)
+
+        dibujar_pantalla_ganaste(pantalla, puntaje_final, nombre_jugador)
 
 
     pygame.display.flip()

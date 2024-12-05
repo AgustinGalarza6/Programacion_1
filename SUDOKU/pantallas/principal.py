@@ -24,3 +24,4 @@ def dibujar_pantalla_principal(pantalla, tiempo_inicio, cant_errores):
     #pygame.mixer.music.stop()
 
 #--------------------------------------------------------------------------------
+    

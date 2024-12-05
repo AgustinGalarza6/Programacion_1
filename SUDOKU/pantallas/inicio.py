@@ -56,3 +56,5 @@ def cambiar_dificultad(dificultad):
         return "Dificil"
     elif dificultad == "Dificil":
         return "Facil"
+
+
