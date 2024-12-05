@@ -189,7 +189,7 @@ while juego_corriendo:
                     if 0 < len(nombre_jugador) <= 15:
                         indice_jugador = buscar_jugador(lista_puntajes,nombre_jugador)
                         cambiar_estadisticas_jugador(lista_puntajes,indice_jugador,puntaje_final,nombre_jugador)
-                        guardar_json("puntajes.json",lista_puntajes)
+                        guardar_json("puntajes.json", lista_puntajes)
                         pantalla_activa = "inicio"
                         nombre_jugador = ""
                     else:
@@ -214,11 +214,6 @@ while juego_corriendo:
 
     
     elif pantalla_activa == "ganaste":
-        # Calcular el tiempo transcurrido
-
-        # Dibujar pantalla de ganaste con el puntaje calculado
-        #puntaje_final = calcular_puntaje(cant_errores, minutos, dificultad, puntaje_base, bonus_dificultad)
-
         dibujar_pantalla_ganaste(pantalla, puntaje_final, nombre_jugador)
 
 
