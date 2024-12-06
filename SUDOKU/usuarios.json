@@ -1,10 +1,14 @@
 [
     {
+        "nombre": "Agustin",
+        "puntos": 6250.0
+    },
+    {
         "nombre": "Federico",
         "puntos": 1187.5
     },
     {
-        "nombre": "Agustin",
-        "puntos": 1250.0
+        "nombre": "Marcos",
+        "puntos": 6250.0
     }
 ]

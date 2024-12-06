@@ -23,10 +23,6 @@
 # print(mi_tupla)
 
 
-
-
-
-
 # SETS
 
 # mi_set = {1, 2, 3, 1}
